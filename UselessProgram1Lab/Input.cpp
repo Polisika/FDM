@@ -4,7 +4,7 @@
 using namespace std;
 
 // Ўаг, количество узлов (включа€ фиктивные), коэф. разр€дки x, y (если сетка
-// равномерна, то kx=ky=1), ширина и длина квадрата, 
+// равномерна, то kx=ky=1), ширина и длина квадрата, л€мбда и гамма
 // узлы (x y) перечисн€ютс€, начина€ слева 
 // снизу, шага€ направо до упора, потом возвраща€сь снова, но на строку выше.
 void inputGrid(istream& input, grid& out)
@@ -13,6 +13,8 @@ void inputGrid(istream& input, grid& out)
 	input >> out.num_nodes;
 	input >> out.kx >> out.ky;
 	input >> out.width >> out.height;
+	input >> out.lambda;
+	input >> out.gamma;
 
 	out.x.resize(out.num_nodes);
 	out.y.resize(out.num_nodes);
@@ -54,10 +56,4 @@ void inputBorder(istream& input, borders& out)
 		for (int j = 0; j < num_nodes; j++)
 			input >> out.bordx[i][j];
 	}
-}
-
-void inputCoeffs(istream& input, double& lambda, double& gamma)
-{
-	input >> lambda;
-	input >> gamma;
 }

@@ -7,6 +7,7 @@ using namespace std;
 // Номеру узла соответствуют координаты в x и y массивах. 
 struct grid
 {
+	double lambda, gamma;
 	int num_nodes;
 	double step;
 	// Коэффициент разрядки
@@ -47,5 +48,11 @@ struct condition
 {
 	int num_cond;
 	double (*getValue)(double, double);
-	condition(int cond, double (*func)(double, double)) : num_cond(cond), getValue(func) {}
+	condition(int cond, double (*func)(double, double)) : getValue(func) 
+	{
+		if (cond != 1 || cond != 2)
+			throw invalid_argument("Number condition have to be 1 or 2");
+		else
+			num_cond = cond;
+	}
 };
