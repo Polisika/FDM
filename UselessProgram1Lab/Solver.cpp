@@ -23,9 +23,9 @@ void Solver::Conditions(Matrix& A, condition& x, condition& y, borders& border, 
 {
 	if (x.num_cond == 1)
 	{
-		for (auto& border : border.bordx)
+		for (auto& bord : border.bordx)
 		{
-			for (auto& node : border)
+			for (auto& node : get<0>(bord))
 			{
 				for (int i = 0; i < A.values.size(); i++)
 					A.values[i][node] = 0;
@@ -34,8 +34,73 @@ void Solver::Conditions(Matrix& A, condition& x, condition& y, borders& border, 
 			}
 		}
 	}
-	else
-		throw exception("Conditions");
+	else if (x.num_cond == 2)
+	{
+		for (auto& border : border.bordx)
+		{
+			for (auto& node : get<0>(border))
+			{
+				// Левая ли граница?
+				if (get<1>(border))
+				{
+					// Тогда учитываем минус
+					int right_node = node + 1;
+					double value = g.lambda / (g.y[right_node] - g.y[node]);
+					A.values[2][node] = value;
+					A.values[2][right_node] = -value;
+				}
+				else
+				{
+					int left_node = node - 1;
+					double value = g.lambda / (g.y[left_node] - g.y[node]);
+					A.values[2][node] = -value;
+					A.values[2][left_node] = value;
+				}
+				b[node] = x.getValue(g.x[node], g.y[node]);
+			}
+		}
+	}
+
+	if (y.num_cond == 1)
+	{
+		for (auto& bord : border.bordy)
+		{
+			for (auto& node : get<0>(bord))
+			{
+				for (int i = 0; i < A.values.size(); i++)
+					A.values[i][node] = 0;
+				A.values[2][node] = 1;
+				b[node] = y.getValue(g.x[node], g.y[node]);
+			}
+		}
+	}
+	else if (y.num_cond == 2)
+	{
+		for (auto& border : border.bordy)
+		{
+			for (auto& node : get<0>(border))
+			{
+				// Нижняя ли граница?
+				if (get<1>(border))
+				{
+					// Тогда учитываем минус
+					int upper_node = node + g.width;
+					double value = g.lambda / (g.y[upper_node] - g.y[node]);
+					A.values[2][node] = value;
+					A.values[2][upper_node] = -value;
+				}
+				else
+				{
+					int lower_node = node - g.width;
+					double value = g.lambda / (g.y[lower_node] - g.y[node]);
+					A.values[2][node] = -value;
+					A.values[2][lower_node] = value;
+				}
+
+				b[node] = y.getValue(g.x[node], g.y[node]);
+			}
+		}
+	}
 }
 
 // Собрать матрицу (с учетом фиктивных узлов).
@@ -78,7 +143,7 @@ void Solver::GetSolve(grid& g, double (*f)(double, double), condition& x, condit
 	vector<double> b(g.height * g.width);
 	Make(g, f, A, b);
 	DropNodes(A, b, needDrop);
-	Conditions(A, x, y, border, b);
+	Conditions(A, x, y, border, b, g);
 	result.resize(b.size());
 	Solve5Diag(A, b, result);
 }

@@ -1,8 +1,11 @@
 #include "Generator.h"
 
 void generate_grid(double step, double kx, double ky, double x0, double y0,
+											double lambda, double gamma,
 											int width, int height, grid& out)
 {
+	out.lambda = lambda;
+	out.gamma = gamma;
 	out.step = step;
 	out.num_nodes = width * height;
 	out.x.resize(out.num_nodes);
