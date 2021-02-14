@@ -14,7 +14,7 @@ public:
 		for (int i = 0; i < diags; i++)
 			values[i].resize(size);
 	}
-	int m; // Õðàíèò ñìåùåíèå îòíîñèòåëüíî äèàãîíàëè.
+	int m; // â€™Ñ€Ð°Ð½Ð¸Ñ‚ ÑÐ¼ÐµÑ‰ÐµÐ½Ð¸Ðµ Ð¾Ñ‚Ð½Ð¾ÑÐ¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾ Ð´Ð¸Ð°Ð³Ð¾Ð½Ð°Ð»Ð¸.
 	vector<vector<double>> values;
 	void display(ostream&);
 };

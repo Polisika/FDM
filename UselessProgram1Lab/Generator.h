@@ -1,8 +1,8 @@
 #pragma once
 #include "Structs.h"
 
-// Сгенерировать квадрат шириной width, высотой height
-// Коэффициент разрядки действует слева направо и снизу вверх
+// РЎРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ РєРІР°РґСЂР°С‚ С€РёСЂРёРЅРѕР№ width, РІС‹СЃРѕС‚РѕР№ height
+// РљРѕСЌС„С„РёС†РёРµРЅС‚ СЂР°Р·СЂСЏРґРєРё РґРµР№СЃС‚РІСѓРµС‚ СЃР»РµРІР° РЅР°РїСЂР°РІРѕ Рё СЃРЅРёР·Сѓ РІРІРµСЂС…
 void generate_grid(double step, double kx, double ky, double x0, double y0,
 											double lambda, double gamma,
 											int width, int height, grid& out);
