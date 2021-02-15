@@ -9,3 +9,8 @@ void Matrix::display(ostream& out)
 		out << endl;
 	}
 }
+
+int Matrix::get_size()
+{
+	return size;
+}

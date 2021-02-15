@@ -5,13 +5,13 @@
 using namespace std;
 
 
-// Номеру узла соответствуют координаты в x и y массивах. 
+// РќРѕРјРµСЂСѓ СѓР·Р»Р° СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‚ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ x Рё y РјР°СЃСЃРёРІР°С…. 
 struct grid
 {
 	double lambda, gamma;
 	int num_nodes;
 	double step;
-	// Коэффициент разрядки
+	// РљРѕСЌС„С„РёС†РёРµРЅС‚ СЂР°Р·СЂСЏРґРєРё
 	double kx, ky;
 	vector<double> x;
 	vector<double> y;
@@ -21,8 +21,8 @@ struct grid
 struct borders
 {
 	int num_x, num_y;
-	vector<tuple<vector<int>, bool>> bordy; // Границы, параллельные y
-	vector<tuple<vector<int>, bool>> bordx; // Границы, параллельные х
+	vector<tuple<vector<int>, bool>> bordy; // Р“СЂР°РЅРёС†С‹, РїР°СЂР°Р»Р»РµР»СЊРЅС‹Рµ y
+	vector<tuple<vector<int>, bool>> bordx; // Р“СЂР°РЅРёС†С‹, РїР°СЂР°Р»Р»РµР»СЊРЅС‹Рµ С…
 
 	bool belongs_bordy(int num_node)
 	{

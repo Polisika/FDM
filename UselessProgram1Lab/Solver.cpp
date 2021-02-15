@@ -1,149 +1,188 @@
 #include "Solver.h"
+
 int diags = 5;
 
-// Решить СЛАУ, матрица которой представляет собой пятидиагональную матрицу.
-void Solver::Solve5Diag(Matrix& A, vector<double>& b, vector<double>& x)
+void Solver::step(Matrix& A, const std::vector<double>& xk, const std::vector<double>& xk_1, std::vector<double>& y, const std::vector<double>& b, const double& w)
 {
-	throw exception("Timur not released this method");
+    for (int i = 0; i < A.get_size(); i++)
+    {
+        double sum1 = 0, sum2 = A.values[2][i] * xk[i];
+
+        // РќРёР¶РЅРёР№ С‚СЂРµСѓРіРѕР»СЊРЅРёРє
+        if (i > A.ig[0] - 1)
+            sum1 += A.values[1][i] * xk_1[i - A.ig[0]];
+
+        if (i > A.ig[1] - 1)
+            sum1 += A.values[0][i] * xk_1[i - A.ig[1]];
+
+        // Р’РµСЂС…РЅРёР№ С‚СЂРµСѓРіРѕР»СЊРЅРёРє
+        if (i < A.get_size() - A.ig[0])
+            sum2 += A.values[3][i] * xk[i + A.ig[0]];
+
+        if (i < A.get_size() - A.ig[1])
+            sum2 += A.values[4][i] * xk[i + A.ig[1]];
+
+        y[i] = xk[i] + w / A.values[2][i] * (b[i] - sum1 - sum2);
+    }
 }
 
-// Убрать из матрицы узлы, которых нет.
+// Р РµС€РёС‚СЊ РЎР›РђРЈ, РјР°С‚СЂРёС†Р° РєРѕС‚РѕСЂРѕР№ РїСЂРµРґСЃС‚Р°РІР»СЏРµС‚ СЃРѕР±РѕР№ РїСЏС‚РёРґРёР°РіРѕРЅР°Р»СЊРЅСѓСЋ РјР°С‚СЂРёС†Сѓ.
+void Solver::Solve5Diag(Matrix& A, vector<double>& b, vector<double>& x, const double& eps, const double& w,
+    const int& max_iter)
+{
+    // РќР°С‡Р°Р»СЊРЅРѕРµ РїСЂРёР±Р»РёР¶РµРЅРёРµ - РЅСѓР»РµРІРѕРµ
+    std::fill(x.begin(), x.end(), 0);
+
+    int N = A.get_size(), iter = 0;
+    double rr = relative_residual(A, b, x);
+
+    while (rr >= eps && iter < max_iter)
+    {
+        step(A, x, x, x, b, w);
+        rr = relative_residual(A, b, x);
+
+        ++iter;
+    }
+}
+
+// РЈР±СЂР°С‚СЊ РёР· РјР°С‚СЂРёС†С‹ СѓР·Р»С‹, РєРѕС‚РѕСЂС‹С… РЅРµС‚.
 void Solver::DropNodes(Matrix& A, vector<double>& b, vector<int> nodes)
 {
-	for (auto& node : nodes)
-	{
-		for (int i = 0; i < A.values.size(); i++)
-			A.values[i][node] = 0;
-		b[node] = 0;
-	}
+    for (auto& node : nodes)
+    {
+        for (int i = 0; i < A.values.size(); i++)
+            A.values[i][node] = 0;
+        b[node] = 0;
+    }
 }
 
-// Учесть краевые условия.
-void Solver::Conditions(Matrix& A, condition& x, condition& y, borders& border, vector<double>& b, grid& g) 
+// РЈС‡РµСЃС‚СЊ РєСЂР°РµРІС‹Рµ СѓСЃР»РѕРІРёСЏ.
+void Solver::Conditions(Matrix& A, condition& x, condition& y, borders& border, vector<double>& b, grid& g)
 {
-	if (x.num_cond == 1)
-	{
-		for (auto& bord : border.bordx)
-		{
-			for (auto& node : get<0>(bord))
-			{
-				for (int i = 0; i < A.values.size(); i++)
-					A.values[i][node] = 0;
-				A.values[2][node] = 1;
-				b[node] = x.getValue(g.x[node], g.y[node]);
-			}
-		}
-	}
-	else if (x.num_cond == 2)
-	{
-		for (auto& border : border.bordx)
-		{
-			for (auto& node : get<0>(border))
-			{
-				// Левая ли граница?
-				if (get<1>(border))
-				{
-					// Тогда учитываем минус
-					int right_node = node + 1;
-					double value = g.lambda / (g.y[right_node] - g.y[node]);
-					A.values[2][node] = value;
-					A.values[2][right_node] = -value;
-				}
-				else
-				{
-					int left_node = node - 1;
-					double value = g.lambda / (g.y[left_node] - g.y[node]);
-					A.values[2][node] = -value;
-					A.values[2][left_node] = value;
-				}
-				b[node] = x.getValue(g.x[node], g.y[node]);
-			}
-		}
-	}
+    if (x.num_cond == 1)
+    {
+        for (auto& bord : border.bordx)
+        {
+            for (auto& node : get<0>(bord))
+            {
+                for (int i = 0; i < A.values.size(); i++)
+                    A.values[i][node] = 0;
+                A.values[2][node] = 1;
+                b[node] = x.getValue(g.x[node], g.y[node]);
+            }
+        }
+    }
+    else if (x.num_cond == 2)
+    {
+        for (auto& border : border.bordx)
+        {
+            for (auto& node : get<0>(border))
+            {
+                // Р›РµРІР°СЏ Р»Рё РіСЂР°РЅРёС†Р°?
+                if (get<1>(border))
+                {
+                    // РўРѕРіРґР° СѓС‡РёС‚С‹РІР°РµРј РјРёРЅСѓСЃ
+                    int right_node = node + 1;
+                    double value = g.lambda / (g.y[right_node] - g.y[node]);
+                    A.values[2][node] = value;
+                    A.values[2][right_node] = -value;
+                }
+                else
+                {
+                    int left_node = node - 1;
+                    double value = g.lambda / (g.y[left_node] - g.y[node]);
+                    A.values[2][node] = -value;
+                    A.values[2][left_node] = value;
+                }
+                b[node] = x.getValue(g.x[node], g.y[node]);
+            }
+        }
+    }
 
-	if (y.num_cond == 1)
-	{
-		for (auto& bord : border.bordy)
-		{
-			for (auto& node : get<0>(bord))
-			{
-				for (int i = 0; i < A.values.size(); i++)
-					A.values[i][node] = 0;
-				A.values[2][node] = 1;
-				b[node] = y.getValue(g.x[node], g.y[node]);
-			}
-		}
-	}
-	else if (y.num_cond == 2)
-	{
-		for (auto& border : border.bordy)
-		{
-			for (auto& node : get<0>(border))
-			{
-				// Нижняя ли граница?
-				if (get<1>(border))
-				{
-					// Тогда учитываем минус
-					int upper_node = node + g.width;
-					double value = g.lambda / (g.y[upper_node] - g.y[node]);
-					A.values[2][node] = value;
-					A.values[2][upper_node] = -value;
-				}
-				else
-				{
-					int lower_node = node - g.width;
-					double value = g.lambda / (g.y[lower_node] - g.y[node]);
-					A.values[2][node] = -value;
-					A.values[2][lower_node] = value;
-				}
+    if (y.num_cond == 1)
+    {
+        for (auto& bord : border.bordy)
+        {
+            for (auto& node : get<0>(bord))
+            {
+                for (int i = 0; i < A.values.size(); i++)
+                    A.values[i][node] = 0;
+                A.values[2][node] = 1;
+                b[node] = y.getValue(g.x[node], g.y[node]);
+            }
+        }
+    }
+    else if (y.num_cond == 2)
+    {
+        for (auto& border : border.bordy)
+        {
+            for (auto& node : get<0>(border))
+            {
+                // РќРёР¶РЅСЏСЏ Р»Рё РіСЂР°РЅРёС†Р°?
+                if (get<1>(border))
+                {
+                    // РўРѕРіРґР° СѓС‡РёС‚С‹РІР°РµРј РјРёРЅСѓСЃ
+                    int upper_node = node + g.width;
+                    double value = g.lambda / (g.y[upper_node] - g.y[node]);
+                    A.values[2][node] = value;
+                    A.values[2][upper_node] = -value;
+                }
+                else
+                {
+                    int lower_node = node - g.width;
+                    double value = g.lambda / (g.y[lower_node] - g.y[node]);
+                    A.values[2][node] = -value;
+                    A.values[2][lower_node] = value;
+                }
 
-				b[node] = y.getValue(g.x[node], g.y[node]);
-			}
-		}
-	}
+                b[node] = y.getValue(g.x[node], g.y[node]);
+            }
+        }
+    }
 }
 
-// Собрать матрицу (с учетом фиктивных узлов).
-// Функция f - функция правой части.
-// b - правая часть уравнения.
+// РЎРѕР±СЂР°С‚СЊ РјР°С‚СЂРёС†Сѓ (СЃ СѓС‡РµС‚РѕРј С„РёРєС‚РёРІРЅС‹С… СѓР·Р»РѕРІ).
+// Р¤СѓРЅРєС†РёСЏ f - С„СѓРЅРєС†РёСЏ РїСЂР°РІРѕР№ С‡Р°СЃС‚Рё.
+// b - РїСЂР°РІР°СЏ С‡Р°СЃС‚СЊ СѓСЂР°РІРЅРµРЅРёСЏ.
 void Solver::Make(grid& g, double (*f)(double, double), Matrix& A, vector<double>& b)
 {
-	int end_node = g.width * (g.height - 1) - 1;
-	for (int i = g.width + 1; i < end_node; i++)
-	{
-		int border_feature = (i + 1) % g.width; // +1 так как нумерация с нуля
-		if (border_feature != 1 && border_feature != 0)
-		{
-			double hxi_1 = g.x[i] - g.x[i - 1],
-				hxi = g.x[i + 1] - g.x[i],
-				hyj_1 = g.y[i] - g.y[i - 1],
-				hyj = g.y[i + 1] - g.x[i];
-			// Для i-го элемента необходимо заполнить строку матрицы.
-			// Берем сначала нижний (- width).
-			A.values[0][i] = 2.0 / (hyj_1 * (hyj + hyj_1));
-			// левый (-1),
-			A.values[1][i] = 2.0 / (hxi_1 * (hxi + hxi_1));
-			// по середине
-			A.values[2][i] = -((2.0 / (hxi_1 * hxi)) + (2.0 / (hyj_1 * hyj)));
-			// правый (+1), 
-			A.values[3][i] = 2.0 / (hxi * (hxi + hxi_1));
-			// верхний (+ width), 
-			A.values[4][i] = 2.0 / (hyj * (hyj + hyj_1));
+    int end_node = g.width * (g.height - 1) - 1;
+    for (int i = g.width + 1; i < end_node; i++)
+    {
+        int border_feature = (i + 1) % g.width; // +1 С‚Р°Рє РєР°Рє РЅСѓРјРµСЂР°С†РёСЏ СЃ РЅСѓР»СЏ
+        if (border_feature != 1 && border_feature != 0)
+        {
+            double hxi_1 = g.x[i] - g.x[i - 1],
+                hxi = g.x[i + 1] - g.x[i],
+                hyj_1 = g.y[i] - g.y[i - 1],
+                hyj = g.y[i + 1] - g.x[i];
+            // Р”Р»СЏ i-РіРѕ СЌР»РµРјРµРЅС‚Р° РЅРµРѕР±С…РѕРґРёРјРѕ Р·Р°РїРѕР»РЅРёС‚СЊ СЃС‚СЂРѕРєСѓ РјР°С‚СЂРёС†С‹.
+            // Р‘РµСЂРµРј СЃРЅР°С‡Р°Р»Р° РЅРёР¶РЅРёР№ (- width).
+            A.values[0][i] = 2.0 / (hyj_1 * (hyj + hyj_1));
+            // Р»РµРІС‹Р№ (-1),
+            A.values[1][i] = 2.0 / (hxi_1 * (hxi + hxi_1));
+            // РїРѕ СЃРµСЂРµРґРёРЅРµ
+            A.values[2][i] = -((2.0 / (hxi_1 * hxi)) + (2.0 / (hyj_1 * hyj)));
+            // РїСЂР°РІС‹Р№ (+1), 
+            A.values[3][i] = 2.0 / (hxi * (hxi + hxi_1));
+            // РІРµСЂС…РЅРёР№ (+ width), 
+            A.values[4][i] = 2.0 / (hyj * (hyj + hyj_1));
 
-			// Заполняем правую часть
-		}	b[i] = f(g.x[i], g.y[i]);
-	}
+            // Р—Р°РїРѕР»РЅСЏРµРј РїСЂР°РІСѓСЋ С‡Р°СЃС‚СЊ
+        }	b[i] = f(g.x[i], g.y[i]);
+    }
 }
 
-// Получить решение МКР.
+// РџРѕР»СѓС‡РёС‚СЊ СЂРµС€РµРЅРёРµ РњРљР .
 void Solver::GetSolve(grid& g, double (*f)(double, double), condition& x, condition& y,
-	borders& border, vector<int>& needDrop, vector<double>& result)
+    borders& border, vector<int>& needDrop, vector<double>& result, const double& eps, const double& w,
+    const int& max_iter)
 {
-	Matrix A(g.height * g.width, diags, g.width);
-	vector<double> b(g.height * g.width);
-	Make(g, f, A, b);
-	DropNodes(A, b, needDrop);
-	Conditions(A, x, y, border, b, g);
-	result.resize(b.size());
-	Solve5Diag(A, b, result);
+    Matrix A(g.height * g.width, diags, g.width);
+    vector<double> b(g.height * g.width);
+    Make(g, f, A, b);
+    DropNodes(A, b, needDrop);
+    Conditions(A, x, y, border, b, g);
+    result.resize(b.size());
+    Solve5Diag(A, b, result, eps, w, max_iter);
 }
