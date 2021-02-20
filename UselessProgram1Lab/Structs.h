@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <tuple>
+#include <ostream>
 
 using namespace std;
 
@@ -16,6 +17,24 @@ struct grid
 	vector<double> x;
 	vector<double> y;
 	int width, height;
+
+	void display(ostream& out)
+	{
+		out << width << "x" << height << endl;
+		out << "step: " << step << endl;
+		out << "x: ";
+		for (int i = 0; i < x.size(); i++)
+			out << x[i] << " ";
+		out << endl;
+
+		out << "y: ";
+		for (int i = 0; i < x.size(); i++)
+			out << y[i] << " ";
+		out << endl;
+
+		out << "lam: " << lambda << endl;
+		out << "gamma: " << gamma << endl;
+	}
 };
 
 struct borders
@@ -24,36 +43,47 @@ struct borders
 	vector<tuple<vector<int>, bool>> bordy; // Границы, параллельные y
 	vector<tuple<vector<int>, bool>> bordx; // Границы, параллельные х
 
-	bool belongs_bordy(int num_node)
+	void display(ostream& out)
 	{
-		for (auto& bord : bordy)
-			for (auto& node : get<0>(bord))
-				if (node == num_node)
-					return true;
+		for (int i = 0; i < num_x; i++)
+		{
+			out << i << " border x: ";
+			auto b = get<0>(bordx[i]);
+			for (int j = 0; j < b.size(); j++)
+				out << b[j] << " ";
+			out << (get<1>(bordx[i]) ? "inverted" : "not inverted");
+			out << endl;
+		}
 
-		return false;
-	}
-
-	bool belongs_bordx(int num_node)
-	{
-		for (auto& bord : bordx)
-			for (auto& node : get<0>(bord))
-				if (node == num_node)
-					return true;
-
-		return false;
+		for (int i = 0; i < num_y; i++)
+		{
+			out << i << " border y: ";
+			auto b = get<0>(bordy[i]);
+			for (int j = 0; j < b.size(); j++)
+				out << b[j] << " ";
+			out << (get<1>(bordy[i]) ? "inverted" : "not inverted");
+			out << endl;
+		}
 	}
 };
 
 struct condition
 {
-	int num_cond;
-	double (*getValue)(double, double);
-	condition(int cond, double (*func)(double, double)) : getValue(func) 
+	int xnum_cond, ynum_cond;
+	vector<vector<double>> values;
+	vector<vector<int>> borders;
+	void display(ostream& out)
 	{
-		if (cond != 1 && cond != 2)
-			throw exception("Number condition have to be 1 or 2");
-		else
-			num_cond = cond;
+		out << "Conditions x: " << xnum_cond << " y: " << ynum_cond << endl;
+		for (int i = 0; i < values.size(); i++)
+		{
+			out << "Values, under - " << i << " border: " << endl;
+			for (int j = 0; j < borders[i].size(); j++)
+				out << borders[i][j] << " ";
+			out << endl;
+			for (int j = 0; j < values[i].size(); j++)
+				out << values[i][j] << " ";
+			out << endl;
+		}
 	}
 };

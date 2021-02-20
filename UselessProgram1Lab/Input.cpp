@@ -1,5 +1,4 @@
-#include "Structs.h"
-#include <istream>
+#include "input.h"
 
 using namespace std;
 
@@ -26,34 +25,75 @@ void inputGrid(istream& input, grid& out)
 	}
 }
 
-// Количество границ, перечисление границ (сначала по х, потом по у): 
-//  Кол-во по оси
-//		Количество узлов, перечисление узлов.
-void inputBorder(istream& input, borders& out)
+void inputCond(istream& input, condition& out)
 {
-	input >> out.num_x;
-	out.bordx.resize(out.num_x);
+	input >> out.xnum_cond >> out.ynum_cond;
+	int num;
+	// Количество границ
+	input >> num; 
+	out.borders.resize(num);
+	out.values.resize(num);
+	for (int i = 0; i < num; i++)
+	{
+		int node; 
+		// Количество узлов
+		input >> node;
+		for (int j = 0; j < node; j++)
+		{
+			// Узел
+			int n;
+			input >> n;
+			out.borders[i].push_back(n);
+			// Значение в этой точке
+			double value;
+			input >> value;
+			out.values[i].push_back(value);
+		}
+	}
+}
 
+void inputBord(istream& input, borders& out)
+{
+	// Количество границ по оси х
+	input >> out.num_x;
+	vector<int> buffx(out.num_x);
+
+	// Количество границ по оси у
+	input >> out.num_y;
+	vector<int> buffy(out.num_y);
+
+	out.bordx.resize(out.num_x);
+	out.bordy.resize(out.num_y);
+	// Записываем границы
 	for (int i = 0; i < out.num_x; i++)
 	{
-		int num_nodes;
-		input >> num_nodes;
-		out.bordx[i].resize(num_nodes);
+		// Инвертированность и количество узлов на границе
+		bool inverted;
+		int count_nodes;
+		input >> inverted;
+		input >> count_nodes;
+		buffx.resize(count_nodes);
+		// Записываем узлы в границу
+		for (int j = 0; j < count_nodes; j++)
+			input >> buffx[j];
 
-		for (int j = 0; j < num_nodes; j++)
-			input >> out.bordx[i][j];
+		out.bordx[i] = make_tuple(buffx, inverted);
+		buffx.clear();
 	}
-
-	input >> out.num_y;
-	out.bordy.resize(out.num_y);
 
 	for (int i = 0; i < out.num_y; i++)
 	{
-		int num_nodes;
-		input >> num_nodes;
-		out.bordx[i].resize(num_nodes);
+		// Инвертированность и количество узлов на границе
+		bool inverted;
+		int count_nodes;
+		input >> inverted;
+		input >> count_nodes;
+		buffy.resize(count_nodes);
+		// Записываем узлы в границу
+		for (int j = 0; j < count_nodes; j++)
+			input >> buffy[j];
 
-		for (int j = 0; j < num_nodes; j++)
-			input >> out.bordx[i][j];
+		out.bordy[i] = make_tuple(buffy, inverted);
+		buffy.clear();
 	}
 }
