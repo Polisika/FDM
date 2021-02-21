@@ -29,7 +29,7 @@ void get_solve(double w, double prec, int maxiters)
 
 	vector<double> res;
 	Solver s;
-	s.GetSolve(g, [](double x, double y) { return x * x + 2.; }, x, border, need_drop, res, prec, w, maxiters);
+	s.GetSolve(g, [](double x, double y) { return x * x - 2.; }, x, border, need_drop, res, prec, w, maxiters);
 	for (int i = 0; i < res.size(); i++)
 		cout << res[i] << " ";
 }
