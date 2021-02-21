@@ -36,5 +36,5 @@ void get_solve(double w, double prec, int maxiters)
 
 int main()
 {
-	get_solve(1, 1e-13, 1000);
+	get_solve(1, 1e-15, 100000);
 }
