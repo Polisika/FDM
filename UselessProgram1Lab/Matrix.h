@@ -20,9 +20,7 @@ public:
 
 		ig.resize(2);
 		ig[0] = 1;
-
-		for (int i = 1; i < ig.size(); i++)
-			ig[i] = m + i + 1;
+		ig[1] = m;
 	}
 
 	int m; // ’ранит смещение относительно диагонали.
