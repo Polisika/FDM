@@ -35,26 +35,26 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	border.num_x = border.num_y = 4;
 	vector<int> border_contains;
 	int node = 0;
-	// Левое основание
+	// Р›РµРІРѕРµ РѕСЃРЅРѕРІР°РЅРёРµ
 	while(find(need_drop.begin(), need_drop.end(), node + 1) == need_drop.end())
 	{
-			// Не найден
+			// РќРµ РЅР°Р№РґРµРЅ
 			border_contains.push_back(node);
-			node++; // Просто перемещаемся дальше по узлам
+			node++; // РџСЂРѕСЃС‚Рѕ РїРµСЂРµРјРµС‰Р°РµРјСЃСЏ РґР°Р»СЊС€Рµ РїРѕ СѓР·Р»Р°Рј
 	}
 	border_contains.push_back(node);
 	vector<tuple<vector<int>, bool>>* current = &(border.bordy);
 	
-	// Нужно отгрузить границу в current
-	// Граница по х, инвертирована
+	// РќСѓР¶РЅРѕ РѕС‚РіСЂСѓР·РёС‚СЊ РіСЂР°РЅРёС†Сѓ РІ current
+	// Р“СЂР°РЅРёС†Р° РїРѕ С…, РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅР°
 	border_contains.shrink_to_fit();
 	bool inverted = true;
 	sort(border_contains.begin(), border_contains.end());
 	current->push_back(make_tuple(border_contains, inverted));
 	border_contains.clear();
 
-	// Так как форма буквы П, то нужно пройтись по букве п
-	// Идем по левой внутренней границе
+	// РўР°Рє РєР°Рє С„РѕСЂРјР° Р±СѓРєРІС‹ Рџ, С‚Рѕ РЅСѓР¶РЅРѕ РїСЂРѕР№С‚РёСЃСЊ РїРѕ Р±СѓРєРІРµ Рї
+	// РРґРµРј РїРѕ Р»РµРІРѕР№ РІРЅСѓС‚СЂРµРЅРЅРµР№ РіСЂР°РЅРёС†Рµ
 	while (find(need_drop.begin(), need_drop.end(), node + 1) != need_drop.end())
 	{
 		border_contains.push_back(node);
@@ -62,8 +62,8 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	}
 	border_contains.push_back(node);
 
-	// Нужно отгрузить границу в current
-	// Граница по y, не инвертирована
+	// РќСѓР¶РЅРѕ РѕС‚РіСЂСѓР·РёС‚СЊ РіСЂР°РЅРёС†Сѓ РІ current
+	// Р“СЂР°РЅРёС†Р° РїРѕ y, РЅРµ РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅР°
 	inverted = false;
 	current = &(border.bordx);
 	border_contains.shrink_to_fit();
@@ -73,7 +73,7 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 
 	border_contains.push_back(node);
 	node++;
-	// Левый верхний (внутри фигуры) узел найден, идем вправо
+	// Р›РµРІС‹Р№ РІРµСЂС…РЅРёР№ (РІРЅСѓС‚СЂРё С„РёРіСѓСЂС‹) СѓР·РµР» РЅР°Р№РґРµРЅ, РёРґРµРј РІРїСЂР°РІРѕ
 	while (find(need_drop.begin(), need_drop.end(), node - g.width) != need_drop.end())
 	{
 		border_contains.push_back(node);
@@ -81,8 +81,8 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	}
 	border_contains.push_back(node);
 
-	// Найдена верхняя внутренняя граница
-	// Граница по x, инвертирована
+	// РќР°Р№РґРµРЅР° РІРµСЂС…РЅСЏСЏ РІРЅСѓС‚СЂРµРЅРЅСЏСЏ РіСЂР°РЅРёС†Р°
+	// Р“СЂР°РЅРёС†Р° РїРѕ x, РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅР°
 	inverted = true;
 	current = &(border.bordy);
 	border_contains.shrink_to_fit();
@@ -92,16 +92,16 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 
 	border_contains.push_back(node);
 	node -= g.width;
-	// Вниз по правой внутренней
+	// Р’РЅРёР· РїРѕ РїСЂР°РІРѕР№ РІРЅСѓС‚СЂРµРЅРЅРµР№
 	while (find(need_drop.begin(), need_drop.end(), node - 1) != need_drop.end())
 	{
 		border_contains.push_back(node);
 		node -= g.width;
 	}
 	
-	// Правая внутренняя граница
-	// Граница инвертирована
-	// Граница по у отгружается
+	// РџСЂР°РІР°СЏ РІРЅСѓС‚СЂРµРЅРЅСЏСЏ РіСЂР°РЅРёС†Р°
+	// Р“СЂР°РЅРёС†Р° РёРЅРІРµСЂС‚РёСЂРѕРІР°РЅР°
+	// Р“СЂР°РЅРёС†Р° РїРѕ Сѓ РѕС‚РіСЂСѓР¶Р°РµС‚СЃСЏ
 	node += g.width;
 	inverted = true;
 	current = &(border.bordx);
@@ -110,11 +110,11 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	current->push_back(make_tuple(border_contains, inverted));
 	border_contains.clear();
 
-	// Далее идем по классике
+	// Р”Р°Р»РµРµ РёРґРµРј РїРѕ РєР»Р°СЃСЃРёРєРµ
 	for (; node < g.width; node++)
 		border_contains.push_back(node);
 
-	// Правое основание
+	// РџСЂР°РІРѕРµ РѕСЃРЅРѕРІР°РЅРёРµ
 	inverted = true;
 	current = &(border.bordy);
 	border_contains.shrink_to_fit();
@@ -123,7 +123,7 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	border_contains.clear();
 
 	node--;
-	// Правая сторона
+	// РџСЂР°РІР°СЏ СЃС‚РѕСЂРѕРЅР°
 	for (; node <= g.num_nodes - 1; node+= g.width)
 		border_contains.push_back(node);
 
@@ -135,7 +135,7 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	border_contains.clear();
 
 	node = g.num_nodes - 1;
-	// Крышка
+	// РљСЂС‹С€РєР°
 	for (; node >= g.num_nodes - g.width; node--)
 		border_contains.push_back(node);
 
@@ -147,7 +147,7 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	border_contains.clear();
 
 	node++;
-	// Левая сторона
+	// Р›РµРІР°СЏ СЃС‚РѕСЂРѕРЅР°
 	for (; node >= 0; node-= g.width)
 		border_contains.push_back(node);
 
@@ -159,7 +159,7 @@ void generate_border(grid& g, borders& border, vector<int> need_drop)
 	border_contains.clear();
 } 
 
-// Генерация первых краевых (на всех границах)
+// Р“РµРЅРµСЂР°С†РёСЏ РїРµСЂРІС‹С… РєСЂР°РµРІС‹С… (РЅР° РІСЃРµС… РіСЂР°РЅРёС†Р°С…)
 void generate_cond11(grid& g, borders& b, condition& cond, double (*u)(double, double))
 {
 	cond.xnum_cond = cond.ynum_cond = 1;
@@ -186,7 +186,7 @@ void generate_cond11(grid& g, borders& b, condition& cond, double (*u)(double, d
 	}
 }
 
-// Генерация первых краевых на х, вторых на игрек
+// Р“РµРЅРµСЂР°С†РёСЏ РїРµСЂРІС‹С… РєСЂР°РµРІС‹С… РЅР° С…, РІС‚РѕСЂС‹С… РЅР° РёРіСЂРµРє
 void generate_cond12(grid& g, borders& b, condition& cond, double (*u)(double, double), double (*dudy)(double, double))
 {
 	cond.xnum_cond = 1;
@@ -214,7 +214,7 @@ void generate_cond12(grid& g, borders& b, condition& cond, double (*u)(double, d
 	}
 }
 
-// Генерация первых краевых на х, вторых на игрек
+// Р“РµРЅРµСЂР°С†РёСЏ РїРµСЂРІС‹С… РєСЂР°РµРІС‹С… РЅР° С…, РІС‚РѕСЂС‹С… РЅР° РёРіСЂРµРє
 void generate_cond21(grid& g, borders& b, condition& cond, double (*dudx)(double, double), double (*u)(double, double))
 {
 	cond.xnum_cond = 2;
@@ -242,7 +242,7 @@ void generate_cond21(grid& g, borders& b, condition& cond, double (*dudx)(double
 	}
 }
 
-// Генерация вторых краевых (на всех границах)
+// Р“РµРЅРµСЂР°С†РёСЏ РІС‚РѕСЂС‹С… РєСЂР°РµРІС‹С… (РЅР° РІСЃРµС… РіСЂР°РЅРёС†Р°С…)
 void generate_cond22(grid& g, borders& b, condition& cond, double (*dudx)(double, double), double (*dudy)(double, double))
 {
 	cond.xnum_cond = cond.ynum_cond = 2;

@@ -40,15 +40,15 @@ void get_solve()
 		cout << res[i] << " ";
 }
 
-// Вернет желанную область
-// params заполнять в main
+// Р’РµСЂРЅРµС‚ Р¶РµР»Р°РЅРЅСѓСЋ РѕР±Р»Р°СЃС‚СЊ
+// params Р·Р°РїРѕР»РЅСЏС‚СЊ РІ main
 void get_grid(map<string, double> ParamsGrid, grid& g)
 {
 	generate_grid(ParamsGrid["step"], ParamsGrid["kx"], ParamsGrid["ky"], ParamsGrid["x0"],
 		ParamsGrid["y0"], ParamsGrid["lambda"], ParamsGrid["gamma"], ParamsGrid["width"], ParamsGrid["height"], g);
 }
 
-// Вернет желанные краевые
+// Р’РµСЂРЅРµС‚ Р¶РµР»Р°РЅРЅС‹Рµ РєСЂР°РµРІС‹Рµ
 void get_cond(int x, int y, double (*u)(double, double), double (*dudx)(double, double), double (*dudy)(double, double),
 	grid& g, borders& b, condition& cond)
 {
@@ -67,8 +67,8 @@ void get_cond(int x, int y, double (*u)(double, double), double (*dudx)(double, 
 
 int main()
 {
-	#pragma region Задание сетки
-	// Заполни параметры
+	#pragma region Р—Р°РґР°РЅРёРµ СЃРµС‚РєРё
+	// Р—Р°РїРѕР»РЅРё РїР°СЂР°РјРµС‚СЂС‹
 	map<string, double> params = { 
 		{"step", 0.2},
 		{"kx", 1},
@@ -84,31 +84,31 @@ int main()
 	get_grid(params, g);
 	#pragma endregion
 
-	#pragma region Задание границ
+	#pragma region Р—Р°РґР°РЅРёРµ РіСЂР°РЅРёС†
 	borders border;
 	vector<int> needDrop({
-		// Введи через запятую узлы, которые хочешь выкинуть из сетки
+		// Р’РІРµРґРё С‡РµСЂРµР· Р·Р°РїСЏС‚СѓСЋ СѓР·Р»С‹, РєРѕС‚РѕСЂС‹Рµ С…РѕС‡РµС€СЊ РІС‹РєРёРЅСѓС‚СЊ РёР· СЃРµС‚РєРё
 		2
 		});
 	generate_border(g, border, needDrop);
 	#pragma endregion
 
-	#pragma region Задание краевых условий (аналитическая функция, её производная)
-	double (*u)(double x, double y) =	// u - аналитическая функция
+	#pragma region Р—Р°РґР°РЅРёРµ РєСЂР°РµРІС‹С… СѓСЃР»РѕРІРёР№ (Р°РЅР°Р»РёС‚РёС‡РµСЃРєР°СЏ С„СѓРЅРєС†РёСЏ, РµС‘ РїСЂРѕРёР·РІРѕРґРЅР°СЏ)
+	double (*u)(double x, double y) =	// u - Р°РЅР°Р»РёС‚РёС‡РµСЃРєР°СЏ С„СѓРЅРєС†РёСЏ
 		[](double x, double y)
 		{ return x * x; };
 
-	double (*dudx)(double x, double y) =	// du - производная аналитической функции по соотствествующей координате
-		[](double x, double y)					// Будь внимателен - ошибку с производной оно не отловит
-	{ return 2. * x; };							// Когда ставишь первые краевые - можешь любой мусор возвращать
+	double (*dudx)(double x, double y) =	// du - РїСЂРѕРёР·РІРѕРґРЅР°СЏ Р°РЅР°Р»РёС‚РёС‡РµСЃРєРѕР№ С„СѓРЅРєС†РёРё РїРѕ СЃРѕРѕС‚СЃС‚РІРµСЃС‚РІСѓСЋС‰РµР№ РєРѕРѕСЂРґРёРЅР°С‚Рµ
+		[](double x, double y)					// Р‘СѓРґСЊ РІРЅРёРјР°С‚РµР»РµРЅ - РѕС€РёР±РєСѓ СЃ РїСЂРѕРёР·РІРѕРґРЅРѕР№ РѕРЅРѕ РЅРµ РѕС‚Р»РѕРІРёС‚
+	{ return 2. * x; };							// РљРѕРіРґР° СЃС‚Р°РІРёС€СЊ РїРµСЂРІС‹Рµ РєСЂР°РµРІС‹Рµ - РјРѕР¶РµС€СЊ Р»СЋР±РѕР№ РјСѓСЃРѕСЂ РІРѕР·РІСЂР°С‰Р°С‚СЊ
 
-	double (*dudy)(double x, double y) =	// du - производная аналитической функции по соотствествующей координате
-		[](double x, double y)					// Будь внимателен - ошибку с производной оно не отловит
-	{ return 0.; };								// Когда ставишь первые краевые - можешь любой мусор возвращать
+	double (*dudy)(double x, double y) =	// du - РїСЂРѕРёР·РІРѕРґРЅР°СЏ Р°РЅР°Р»РёС‚РёС‡РµСЃРєРѕР№ С„СѓРЅРєС†РёРё РїРѕ СЃРѕРѕС‚СЃС‚РІРµСЃС‚РІСѓСЋС‰РµР№ РєРѕРѕСЂРґРёРЅР°С‚Рµ
+		[](double x, double y)					// Р‘СѓРґСЊ РІРЅРёРјР°С‚РµР»РµРЅ - РѕС€РёР±РєСѓ СЃ РїСЂРѕРёР·РІРѕРґРЅРѕР№ РѕРЅРѕ РЅРµ РѕС‚Р»РѕРІРёС‚
+	{ return 0.; };								// РљРѕРіРґР° СЃС‚Р°РІРёС€СЊ РїРµСЂРІС‹Рµ РєСЂР°РµРІС‹Рµ - РјРѕР¶РµС€СЊ Р»СЋР±РѕР№ РјСѓСЃРѕСЂ РІРѕР·РІСЂР°С‰Р°С‚СЊ
 
 	condition cond;
-	int num_x_cond = 1; // Номер краевого, когда зафиксирован x
-	int num_y_cond = 1; // Номер краевого, когда зафиксирован у
+	int num_x_cond = 1; // РќРѕРјРµСЂ РєСЂР°РµРІРѕРіРѕ, РєРѕРіРґР° Р·Р°С„РёРєСЃРёСЂРѕРІР°РЅ x
+	int num_y_cond = 1; // РќРѕРјРµСЂ РєСЂР°РµРІРѕРіРѕ, РєРѕРіРґР° Р·Р°С„РёРєСЃРёСЂРѕРІР°РЅ Сѓ
 	get_cond(num_x_cond, num_y_cond, u, dudx, dudy, g, border, cond);
 	#pragma endregion
 
@@ -117,11 +117,11 @@ int main()
 	Solver s;
 	s.GetSolve(g, 
 		[](double x, double y)
-		{ return x * x - 2.; }, // Функция f правой части
+		{ return x * x - 2.; }, // Р¤СѓРЅРєС†РёСЏ f РїСЂР°РІРѕР№ С‡Р°СЃС‚Рё
 		cond, border, needDrop, result, 1e-13, 1, 100000);
 	#pragma endregion
 
-	#pragma region Печать результатов
+	#pragma region РџРµС‡Р°С‚СЊ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ
 	cout << setprecision(5) << scientific << setw(15);
 	cout << "Result \t\tanalytic \terror" << endl;
 
@@ -130,7 +130,7 @@ int main()
 		cout << result[i] << "\t";
 		double val = u(g.x[i], g.y[i]);
 
-		// Если строка нулевая, то и значение, и погрешность ноль.
+		// Р•СЃР»Рё СЃС‚СЂРѕРєР° РЅСѓР»РµРІР°СЏ, С‚Рѕ Рё Р·РЅР°С‡РµРЅРёРµ, Рё РїРѕРіСЂРµС€РЅРѕСЃС‚СЊ РЅРѕР»СЊ.
 		if (find(needDrop.begin(), needDrop.end(), i) != needDrop.end())
 		{
 			cout << 0. << "\t" << 0. << endl;
