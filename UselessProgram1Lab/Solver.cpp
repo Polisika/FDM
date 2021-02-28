@@ -1,5 +1,6 @@
 #include "Solver.h"
 #include <cmath>
+#include <algorithm>
 
 int diags = 5;
 
@@ -64,33 +65,46 @@ void Solver::Conditions(Matrix& A, condition& cond, borders& border, vector<doub
 {
     if (cond.xnum_cond == 1)
     {
-        int i_ = 0;
         for (auto& bord : border.bordx)
         {
+            int index = 0;
+            // Нашли индекс в краевых условиях
+            for (; index < cond.borders.size(); index++)
+                if (cond.similar(get<0>(bord), cond.borders[index]))
+                    break;
+
+            // Обнуляем строки в матрице по всем найденным узлам
+            // Присваиваем значения в соответствии с порядком
             int j_ = 0;
             for (auto& node : get<0>(bord))
             {
                 for (int i = 0; i < A.values.size(); i++)
                     A.values[i][node] = 0;
                 A.values[2][node] = 1;
-                b[node] = cond.values[i_][j_];
+                b[node] = cond.values[index][j_];
                 j_++;
             }
-            i_++;
         }
     }
     else if (cond.xnum_cond == 2)
     {
-        int i_ = 0;
-        for (auto& border : border.bordx)
+        for (auto& bord : border.bordx)
         {
+            int index = 0;
+            // Нашли индекс в краевых условиях
+            for (; index < cond.borders.size(); index++)
+                if (cond.similar(get<0>(bord), cond.borders[index]))
+                    break;
+
+            // Обнуляем строки в матрице по всем найденным узлам
+            // Присваиваем значения в соответствии с порядком
             int j_ = 0;
-            for (auto& node : get<0>(border))
+            for (auto& node : get<0>(bord))
             {
                 for (int i = 0; i < A.values.size(); i++)
                     A.values[i][node] = 0;
-                // Левая ли граница?
-                if (get<1>(border))
+
+                if (get<1>(bord))
                 {
                     // Тогда учитываем минус
                     int right_node = node + 1;
@@ -105,42 +119,55 @@ void Solver::Conditions(Matrix& A, condition& cond, borders& border, vector<doub
                     A.values[2][node] = -value;
                     A.values[2][left_node] = value;
                 }
-                b[node] = cond.values[i_][j_];
+
+                b[node] = cond.values[index][j_];
                 j_++;
             }
-            i_++;
         }
     }
 
     if (cond.ynum_cond == 1)
     {
-        int i_ = border.bordx.size();
         for (auto& bord : border.bordy)
         {
+            int index = 0;
+            // Нашли индекс в краевых условиях
+            for (; index < cond.borders.size(); index++)
+                if (cond.similar(get<0>(bord), cond.borders[index]))
+                    break;
+
+            // Обнуляем строки в матрице по всем найденным узлам
+            // Присваиваем значения в соответствии с порядком
             int j_ = 0;
             for (auto& node : get<0>(bord))
             {
                 for (int i = 0; i < A.values.size(); i++)
                     A.values[i][node] = 0;
                 A.values[2][node] = 1;
-                b[node] = cond.values[i_][j_];
+                b[node] = cond.values[index][j_];
                 j_++;
             }
-            i_++;
         }
     }
     else if (cond.ynum_cond == 2)
     {
-        int i_ = 0;
-        for (auto& border : border.bordy)
+        for (auto& bord : border.bordy)
         {
+            int index = 0;
+            // Нашли индекс в краевых условиях
+            for (; index < cond.borders.size(); index++)
+                if (cond.similar(get<0>(bord), cond.borders[index]))
+                    break;
+
+            // Обнуляем строки в матрице по всем найденным узлам
+            // Присваиваем значения в соответствии с порядком
             int j_ = 0;
-            for (auto& node : get<0>(border))
+            for (auto& node : get<0>(bord))
             {
                 for (int i = 0; i < A.values.size(); i++)
                     A.values[i][node] = 0;
-                // Нижняя ли граница?
-                if (get<1>(border))
+
+                if (get<1>(bord))
                 {
                     // Тогда учитываем минус
                     int upper_node = node + g.width;
@@ -156,10 +183,9 @@ void Solver::Conditions(Matrix& A, condition& cond, borders& border, vector<doub
                     A.values[2][lower_node] = value;
                 }
 
-                b[node] = cond.values[i_][j_];
+                b[node] = cond.values[index][j_];
                 j_++;
             }
-            i_++;
         }
     }
 }
@@ -177,8 +203,8 @@ void Solver::Make(grid& g, double (*f)(double, double), Matrix& A, vector<double
         {
             double hxi_1 = g.step * pow(g.kx, i % g.width),
                 hxi = hxi_1 * g.kx,
-                hyj_1 = g.step * pow(g.kx, i % g.height),
-                hyj = hyj_1 * g.kx;
+                hyj_1 = g.step * pow(g.ky, i % g.height),
+                hyj = hyj_1 * g.ky;
             // Для i-го элемента необходимо заполнить строку матрицы.
             // Берем сначала нижний (- width).
             A.values[0][i] = 2.0 / (hyj_1 * (hyj + hyj_1));
@@ -192,7 +218,8 @@ void Solver::Make(grid& g, double (*f)(double, double), Matrix& A, vector<double
             A.values[4][i] = 2.0 / (hyj * (hyj + hyj_1));
 
             // Заполняем правую часть
-        }	b[i] = f(g.x[i], g.y[i]);
+            b[i] = f(g.x[i], g.y[i]);
+        }	
     }
 }
 

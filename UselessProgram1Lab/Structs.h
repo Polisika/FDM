@@ -2,6 +2,7 @@
 #include <vector>
 #include <tuple>
 #include <ostream>
+#include <set>
 
 using namespace std;
 
@@ -85,5 +86,15 @@ struct condition
 				out << values[i][j] << " ";
 			out << endl;
 		}
+	}
+
+	bool similar(vector<int> a, vector<int> b)
+	{
+		set<int> first(a.begin(), a.end());
+		set<int> second(b.begin(), b.end());
+		if (first == second)
+			return true;
+		else
+			return false;
 	}
 };
