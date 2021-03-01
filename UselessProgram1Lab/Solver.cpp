@@ -207,15 +207,15 @@ void Solver::Make(grid& g, double (*f)(double, double), Matrix& A, vector<double
                 hyj = hyj_1 * g.ky;
             // Для i-го элемента необходимо заполнить строку матрицы.
             // Берем сначала нижний (- width).
-            A.values[0][i] = 2.0 / (hyj_1 * (hyj + hyj_1));
+            A.values[0][i] = -(2.0 / (hyj_1 * (hyj + hyj_1))) * g.lambda;
             // левый (-1),
-            A.values[1][i] = 2.0 / (hxi_1 * (hxi + hxi_1));
+            A.values[1][i] = -(2.0 / (hxi_1 * (hxi + hxi_1))) * g.lambda;
             // по середине
-            A.values[2][i] = -((2.0 / (hxi_1 * hxi)) + (2.0 / (hyj_1 * hyj)));
+            A.values[2][i] = ((2.0 / (hxi_1 * hxi)) + (2.0 / (hyj_1 * hyj)) + g.gamma);
             // правый (+1), 
-            A.values[3][i] = 2.0 / (hxi * (hxi + hxi_1));
+            A.values[3][i] = -(2.0 / (hxi * (hxi + hxi_1))) * g.lambda;
             // верхний (+ width), 
-            A.values[4][i] = 2.0 / (hyj * (hyj + hyj_1));
+            A.values[4][i] = -(2.0 / (hyj * (hyj + hyj_1))) * g.lambda;
 
             // Заполняем правую часть
             b[i] = f(g.x[i], g.y[i]);
