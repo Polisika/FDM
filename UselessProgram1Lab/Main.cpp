@@ -66,44 +66,6 @@ void get_cond(int x, int y, double (*u)(double, double), double (*dudx)(double, 
 }
 #pragma endregion
 
-//void run_test(ofstream& out, map<string, double> params, vector<int> needDrop, double(*u)(double, double),
-//    double (*dudx)(double, double), double (*dudy)(double, double), double (*f)(double, double),
-//    int num_x_cond, int num_y_cond)
-//{
-//    // Сетка
-//    grid g;
-//    get_grid(params, g);
-//
-//    // Границы
-//    borders border;
-//    generate_border(g, border, needDrop);
-//
-//    // Краевые условия
-//    condition cond;
-//    get_cond(num_x_cond, num_y_cond, u, dudx, dudy, g, border, cond);
-//
-//    // Решение
-//    vector<double> result;
-//    Solver s;
-//    s.GetSolve(g, f, cond, border, needDrop, result, EPS, WEIGHT, MAX_ITER);
-//
-//    // Печать результатов
-//    out << "U;U*;|U - U*|" << endl;
-//
-//    for (int i = 0; i < result.size(); i++)
-//    {
-//        out << fixed << setprecision(5) << result[i] << ";";
-//        
-//        double val = u(g.x[i], g.y[i]);
-//
-//        // Если строка нулевая, то и значение, и погрешность ноль.
-//        if (find(needDrop.begin(), needDrop.end(), i) != needDrop.end())
-//            out << fixed << setprecision(5) << 0. << ";" << 0. << endl;
-//        else
-//            out << fixed << setprecision(5) << val << ";" << result[i] - val << endl;
-//    }
-//}
-
 class TestCase
 {
 private:
@@ -192,29 +154,6 @@ int main()
             [](double x, double y) { return 1.; }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
-        ),
-
-        // 3.2
-        TestCase(
-            map<string, double>
-            {
-                {"step", 0.2},
-                {"kx", 1},
-                {"ky", 1},
-                {"x0", 0},
-                {"y0", 0},
-                {"lambda", 1},
-                {"gamma", 2},
-                {"width", 5},
-                {"height", 4},
-            },
-            vector<int> {2},
-            [](double x, double y) { return x + y; }, // u
-            [](double x, double y) { return 1.; }, // dudx
-            [](double x, double y) { return 1.; }, // dudy
-            [](double x, double y) { return 2 * (x + y); }, // f
-            1, // краевые при фиксированном х
-            2 // краевые при фиксированном y
         ),
 #pragma endregion
 
@@ -324,10 +263,10 @@ int main()
                 {"y0", 0},
                 {"lambda", 2},
                 {"gamma", 3},
-                {"width", 5},
-                {"height", 4},
+                {"width", 10},
+                {"height", 8},
             },
-            vector<int> {20},
+            vector<int> {3, 4, 13, 14},
             [](double x, double y) { return exp(x + y); }, // u
             [](double x, double y) { return exp(x + y); }, // dudx
             [](double x, double y) { return exp(x + y); }, // dudy
@@ -347,10 +286,10 @@ int main()
                 {"y0", 0},
                 {"lambda", 2},
                 {"gamma", 3},
-                {"width", 5},
-                {"height", 4},
+                {"width", 20},
+                {"height", 16},
             },
-            vector<int> {40},
+            vector<int> {6, 7, 26, 27},
             [](double x, double y) { return exp(x + y); }, // u
             [](double x, double y) { return exp(x + y); }, // dudx
             [](double x, double y) { return exp(x + y); }, // dudy
@@ -370,10 +309,10 @@ int main()
                 {"y0", 0},
                 {"lambda", 2},
                 {"gamma", 3},
-                {"width", 5},
-                {"height", 4},
+                {"width", 40},
+                {"height", 32},
             },
-            vector<int> {80},
+            vector<int> {13, 14, 53, 54},
             [](double x, double y) { return exp(x + y); }, // u
             [](double x, double y) { return exp(x + y); }, // dudx
             [](double x, double y) { return exp(x + y); }, // dudy
@@ -393,10 +332,10 @@ int main()
                 {"y0", 0},
                 {"lambda", 2},
                 {"gamma", 3},
-                {"width", 5},
-                {"height", 4},
+                {"width", 80},
+                {"height", 64},
             },
-            vector<int> {160},
+            vector<int> {13, 14, 93, 94},
             [](double x, double y) { return exp(x + y); }, // u
             [](double x, double y) { return exp(x + y); }, // dudx
             [](double x, double y) { return exp(x + y); }, // dudy
@@ -416,10 +355,10 @@ int main()
                 {"y0", 0},
                 {"lambda", 2},
                 {"gamma", 3},
-                {"width", 5},
-                {"height", 4},
+                {"width", 160},
+                {"height", 128},
             },
-            vector<int> {320},
+            vector<int> {13, 14, 173, 174},
             [](double x, double y) { return exp(x + y); }, // u
             [](double x, double y) { return exp(x + y); }, // dudx
             [](double x, double y) { return exp(x + y); }, // dudy
