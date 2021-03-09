@@ -116,15 +116,15 @@ public:
 
         for (int i = 0; i < result.size(); i++)
         {
-            out << fixed << setprecision(5) << result[i] << ",";
+            out << scientific << setprecision(7) << result[i] << ",";
 
             double val = u(g.x[i], g.y[i]);
 
             // Если строка нулевая, то и значение, и погрешность ноль.
             if (find(needDrop.begin(), needDrop.end(), i) != needDrop.end())
-                out << fixed << setprecision(5) << 0. << "," << 0. << endl;
+                out << scientific << setprecision(7) << 0. << "," << 0. << endl;
             else
-                out << fixed << setprecision(5) << val << "," << result[i] - val << endl;
+                out << scientific << setprecision(7) << val << "," << abs(result[i] - val) << endl;
         }
     }
 };
@@ -152,6 +152,28 @@ int main()
             [](double x, double y) { return 0.; }, // dudx
             [](double x, double y) { return 0.; }, // dudy
             [](double x, double y) { return 1.; }, // f
+            1, // краевые при фиксированном х
+            1 // краевые при фиксированном y
+        ),
+        // 3.2
+        TestCase(
+            map<string, double>
+            {
+                {"step", 0.2},
+                {"kx", 1},
+                {"ky", 1},
+                {"x0", 0},
+                {"y0", 0},
+                {"lambda", 1},
+                {"gamma", 2},
+                {"width", 5},
+                {"height", 4},
+            },
+            vector<int> {2},
+            [](double x, double y) { return x + y; }, // u
+            [](double x, double y) { return 1.; }, // dudx
+            [](double x, double y) { return 1.; }, // dudy
+            [](double x, double y) { return 2 * (x + y); }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
         ),
@@ -261,16 +283,16 @@ int main()
                 {"ky", 1},
                 {"x0", 0},
                 {"y0", 0},
-                {"lambda", 2},
-                {"gamma", 3},
+                {"lambda", 1},
+                {"gamma", 1},
                 {"width", 10},
                 {"height", 8},
             },
             vector<int> {3, 4, 13, 14},
-            [](double x, double y) { return exp(x + y); }, // u
-            [](double x, double y) { return exp(x + y); }, // dudx
-            [](double x, double y) { return exp(x + y); }, // dudy
-            [](double x, double y) { return -exp(x + y); }, // f
+            [](double x, double y) { return sin(x + y); }, // u
+            [](double x, double y) { return cos(x + y); }, // dudx
+            [](double x, double y) { return cos(x + y); }, // dudy
+            [](double x, double y) { return 3 * sin(x + y); }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
         ),
@@ -280,20 +302,20 @@ int main()
             map<string, double>
             {
                 {"step", INIT_STEP / 2},
-                {"kx", 1},
-                {"ky", 1},
-                {"x0", 0},
-                {"y0", 0},
-                {"lambda", 2},
-                {"gamma", 3},
+                { "kx", 1 },
+                { "ky", 1 },
+                { "x0", 0 },
+                { "y0", 0 },
+                { "lambda", 1 },
+                { "gamma", 1 },
                 {"width", 20},
                 {"height", 16},
             },
             vector<int> {6, 7, 26, 27},
-            [](double x, double y) { return exp(x + y); }, // u
-            [](double x, double y) { return exp(x + y); }, // dudx
-            [](double x, double y) { return exp(x + y); }, // dudy
-            [](double x, double y) { return -exp(x + y); }, // f
+            [](double x, double y) { return sin(x + y); }, // u
+            [](double x, double y) { return cos(x + y); }, // dudx
+            [](double x, double y) { return cos(x + y); }, // dudy
+            [](double x, double y) { return 3 * sin(x + y); }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
         ),
@@ -303,20 +325,20 @@ int main()
             map<string, double>
             {
                 {"step", INIT_STEP / 4},
-                {"kx", 1},
-                {"ky", 1},
-                {"x0", 0},
-                {"y0", 0},
-                {"lambda", 2},
-                {"gamma", 3},
+                { "kx", 1 },
+                { "ky", 1 },
+                { "x0", 0 },
+                { "y0", 0 },
+                { "lambda", 1 },
+                { "gamma", 1 },
                 {"width", 40},
                 {"height", 32},
             },
             vector<int> {13, 14, 53, 54},
-            [](double x, double y) { return exp(x + y); }, // u
-            [](double x, double y) { return exp(x + y); }, // dudx
-            [](double x, double y) { return exp(x + y); }, // dudy
-            [](double x, double y) { return -exp(x + y); }, // f
+            [](double x, double y) { return sin(x + y); }, // u
+            [](double x, double y) { return cos(x + y); }, // dudx
+            [](double x, double y) { return cos(x + y); }, // dudy
+            [](double x, double y) { return 3 * sin(x + y); }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
         ),
@@ -330,16 +352,16 @@ int main()
                 {"ky", 1},
                 {"x0", 0},
                 {"y0", 0},
-                {"lambda", 2},
-                {"gamma", 3},
+                {"lambda", 1},
+                {"gamma", 1},
                 {"width", 80},
                 {"height", 64},
             },
             vector<int> {13, 14, 93, 94},
-            [](double x, double y) { return exp(x + y); }, // u
-            [](double x, double y) { return exp(x + y); }, // dudx
-            [](double x, double y) { return exp(x + y); }, // dudy
-            [](double x, double y) { return -exp(x + y); }, // f
+                    [](double x, double y) { return sin(x + y); }, // u
+                    [](double x, double y) { return cos(x + y); }, // dudx
+                    [](double x, double y) { return cos(x + y); }, // dudy
+                    [](double x, double y) { return 3 * sin(x + y); }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
         ),
@@ -353,16 +375,16 @@ int main()
                 {"ky", 1},
                 {"x0", 0},
                 {"y0", 0},
-                {"lambda", 2},
-                {"gamma", 3},
+                {"lambda", 1},
+                {"gamma", 1},
                 {"width", 160},
                 {"height", 128},
             },
             vector<int> {13, 14, 173, 174},
-            [](double x, double y) { return exp(x + y); }, // u
-            [](double x, double y) { return exp(x + y); }, // dudx
-            [](double x, double y) { return exp(x + y); }, // dudy
-            [](double x, double y) { return -exp(x + y); }, // f
+                    [](double x, double y) { return sin(x + y); }, // u
+                    [](double x, double y) { return cos(x + y); }, // dudx
+                    [](double x, double y) { return cos(x + y); }, // dudy
+                    [](double x, double y) { return 3 * sin(x + y); }, // f
             1, // краевые при фиксированном х
             1 // краевые при фиксированном y
         ),
@@ -372,6 +394,7 @@ int main()
     for (int i = 0; i < tests.size(); i++)
     {
         ofstream out("test" + to_string(i + 1) + ".csv");
+        cout << "Running test #" << i + 1 << endl;
 
         tests[i].run(out);
     }
